@@ -5,20 +5,31 @@ using System.Text;
 
 namespace AnalyseBreakRules
 {
-    class Members
+    public class Members
     {
         /*
          * 人员类
             Members
             姓名
             name
+           行车组
+            team
             职名
             jobName
             政治面貌
             politicalOutlook
          * */
-        string name { get; set; }
-        string jobName { get; set; }
-        string politicalOutlook { get; set; }
+        public string name { get; set; }
+        public string team { get; set; }
+        public string jobName { get; set; }
+        public string politicalOutlook { get; set; }
+
+        public Members()
+        {
+            name = "";
+            team = "";
+            jobName = "";
+            politicalOutlook = "";
+        }
     }
 }
