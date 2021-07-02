@@ -524,7 +524,7 @@ namespace AnalyseBreakRules
                             _br.keyWord = _keyWord;
                             if(_corb.solutions.Count != 0)
                             {
-                                int randomNumber = rd.Next(-1, _corb.solutions.Count - 1);
+                                int randomNumber = rd.Next(0, _corb.solutions.Count - 1);
                                 if (_corb.analyseText.Count > randomNumber)
                                 {
                                     _br.analyseContent = _corb.analyseText[randomNumber];
@@ -595,8 +595,11 @@ namespace AnalyseBreakRules
                 {
                     Table table = doc.Sections[0].Tables[0] as Table;
                     bool hasGotIt = false;
-                    int targetPlace = -1;
-                    //遍历表格中的段落，找到需要的位置添加
+                    bool hasGotLevel0 = false;
+                    int targetLv0Place = -1;
+                    int targetLv1Place = -1;
+                    string content = "";
+                    //遍历表格中的段落，找到需要的位置添加(先找lv0的)
                     for (int i = 0; i < table.Rows.Count; i++)
                     {
                         TableRow row = table.Rows[i];
@@ -616,8 +619,14 @@ namespace AnalyseBreakRules
                                             //命中
                                             if (Text.Contains(_allCORB[ij].keyWords[k]))
                                             {
-                                                hasGotIt = true;
-                                                targetPlace = ij;
+                                                content = Text;
+                                                if(_allCORB[ij].rankOfRuleBreaks == 0 && !hasGotLevel0)
+                                                {
+                                                    hasGotIt = true;
+                                                    hasGotLevel0 = true;
+                                                    targetLv0Place = ij;
+                                                }
+
                                             }
                                         }
                                     }
@@ -625,6 +634,42 @@ namespace AnalyseBreakRules
                             }
                         }
                     }
+                    //再找lv1的
+                    if (!hasGotLevel0)
+                    {
+                        for (int i = 0; i < table.Rows.Count; i++)
+                        {
+                            TableRow row = table.Rows[i];
+                            for (int j = 0; j < row.Cells.Count; j++)
+                            {
+                                TableCell cell = row.Cells[j];
+                                foreach (Paragraph paragraph in cell.Paragraphs)
+                                {
+                                    //判断它符合哪个keyword,0和1都找一遍
+                                    string Text = paragraph.Text.ToString().Trim();
+                                    if (Text.Contains("概况："))
+                                    {
+                                        for (int ij = 0; ij < _allCORB.Count; ij++)
+                                        {
+                                            for (int k = 0; k < _allCORB[ij].keyWords.Length; k++)
+                                            {
+                                                //命中
+                                                if (Text.Contains(_allCORB[ij].keyWords[k]))
+                                                {
+                                                    if (_allCORB[ij].rankOfRuleBreaks == 1)
+                                                    {
+                                                        hasGotIt = true;
+                                                        targetLv1Place = ij;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    string test = content;
                     if (hasGotIt)
                     {
                         //遍历表格中的段落，找到需要的位置添加
@@ -639,14 +684,29 @@ namespace AnalyseBreakRules
                                     //判断它符合哪个keyword,0和1都找一遍
                                     string Text = paragraph.Text.ToString().Trim();
                                     //把相应的分析与措施添加进去
-                                    if (Text.Contains("分析："))
+                                    if(targetLv0Place != -1)
                                     {
-                                        _allCORB[targetPlace].analyseText.Add(Text.Replace("分析：", ""));
+                                        if (Text.Contains("分析："))
+                                        {
+                                            _allCORB[targetLv0Place].analyseText.Add(Text.Replace("分析：", ""));
+                                        }
+                                        if (Text.Contains("措施："))
+                                        {
+                                            _allCORB[targetLv0Place].solutions.Add(Text.Replace("措施：", ""));
+                                        }
                                     }
-                                    if (Text.Contains("措施："))
+                                    else if(targetLv1Place != -1)
                                     {
-                                        _allCORB[targetPlace].solutions.Add(Text.Replace("措施：", ""));
+                                        if (Text.Contains("分析："))
+                                        {
+                                            _allCORB[targetLv1Place].analyseText.Add(Text.Replace("分析：", ""));
+                                        }
+                                        if (Text.Contains("措施："))
+                                        {
+                                            _allCORB[targetLv1Place].solutions.Add(Text.Replace("措施：", ""));
+                                        }
                                     }
+
                                 }
                             }
                         }
@@ -690,31 +750,69 @@ namespace AnalyseBreakRules
                                 //时间,在下一个格子里填上
                                 if (paragraph.Text.ToString().Trim().Equals("时间"))
                                 {
-                                    TextRange tableRange = table[i, j+1].AddParagraph().AppendText(_br.time);
+                                    DateTime dt = new DateTime();
+                                    Random rd = new Random();
+                                    bool hasGot = false;
+                                    if (_br.time.Contains("-"))
+                                    {
+                                        try
+                                        {
+                                            dt = DateTime.Parse(_br.time);
+                                            hasGot = true;
+                                        }
+                                        catch (Exception e)
+                                        {
+
+                                        }
+                                    }
+                                    else if (_br.time.Contains("/"))
+                                    {
+
+                                        try
+                                        {
+                                            dt = DateTime.Parse(_br.time);
+                                            hasGot = true;
+                                        }
+                                        catch(Exception e)
+                                        {
+                                            
+                                        }
+
+                                    }
+                                    TextRange tableRange;
+                                    if (hasGot)
+                                    {
+
+                                        tableRange = table[i, j + 1].Paragraphs[0].AppendText(dt.AddDays(rd.Next(1, 8)).ToString("MM月dd日"));
+                                    }
+                                    else
+                                    {
+                                        tableRange = table[i, j + 1].Paragraphs[0].AppendText(_br.time);
+                                    }
                                     tableRange.CharacterFormat.FontName = "宋体";
                                     tableRange.CharacterFormat.FontSize = 12;
                                 }
                                 if (paragraph.Text.ToString().Trim().Equals("责任人"))
                                 {
-                                    TextRange tableRange = table[i, j + 1].AddParagraph().AppendText(_br.peopleLiable);
+                                    TextRange tableRange = table[i, j + 1].Paragraphs[0].AppendText(_br.peopleLiable);
                                     tableRange.CharacterFormat.FontName = "宋体";
                                     tableRange.CharacterFormat.FontSize = 12;
                                 }
                                 if (paragraph.Text.ToString().Trim().Equals("班组"))
                                 {
-                                    TextRange tableRange = table[i, j + 1].AddParagraph().AppendText(_br.team);
+                                    TextRange tableRange = table[i, j + 1].Paragraphs[0].AppendText(_br.team);
                                     tableRange.CharacterFormat.FontName = "宋体";
                                     tableRange.CharacterFormat.FontSize = 12;
                                 }
                                 if (paragraph.Text.ToString().Trim().Equals("职名"))
                                 {
-                                    TextRange tableRange = table[i, j + 1].AddParagraph().AppendText(_br.jobName);
+                                    TextRange tableRange = table[i, j + 1].Paragraphs[0].AppendText(_br.jobName);
                                     tableRange.CharacterFormat.FontName = "宋体";
                                     tableRange.CharacterFormat.FontSize = 12;
                                 }
                                 if (paragraph.Text.ToString().Trim().Equals("政治"))
                                 {
-                                    TextRange tableRange = table[i, j + 1].AddParagraph().AppendText(_br.politicalOutlook);
+                                    TextRange tableRange = table[i, j + 1].Paragraphs[0].AppendText(_br.politicalOutlook);
                                     tableRange.CharacterFormat.FontName = "宋体";
                                     tableRange.CharacterFormat.FontSize = 12;
                                 }
@@ -782,7 +880,7 @@ namespace AnalyseBreakRules
                     }
                 }
                 //另存为文件，存在“Outputs”文件夹
-                doc.SaveToFile(count.ToString()+"违标分析-"+_br.peopleLiable+".docx", FileFormat.Docx2013);
+                doc.SaveToFile(Application.StartupPath + "\\Outputs\\"+count.ToString()+"违标分析-"+_br.peopleLiable+".docx", FileFormat.Docx2013);
                 count++;
             }
         }
