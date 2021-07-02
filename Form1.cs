@@ -438,13 +438,13 @@ namespace AnalyseBreakRules
                 if (row.GetCell(peopleColumn) != null &&
                     row.GetCell(peopleColumn).ToString().Trim().Length != 0)
                 {
-                    _br.peopleLiable = row.GetCell(peopleColumn).ToString().Trim();
+                    _br.peopleLiable = row.GetCell(peopleColumn).ToString().Trim().Replace(" ","");
                 }
                 //处理人
                 if (row.GetCell(hostColumn) != null &&
                     row.GetCell(hostColumn).ToString().Trim().Length != 0)
                 {
-                    _br.analyseHost = row.GetCell(hostColumn).ToString().Trim();
+                    _br.analyseHost = row.GetCell(hostColumn).ToString().Trim().Replace(" ", "");
                 }
                 //整改措施
                 if (row.GetCell(solutionsColumn) != null &&
