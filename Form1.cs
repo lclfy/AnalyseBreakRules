@@ -35,6 +35,7 @@ namespace AnalyseBreakRules
         //会议主持人与参会人员
         string host;
         string teamMembers;
+        string[] randomTeamMembers;
 
         public Form1()
         {
@@ -54,6 +55,7 @@ namespace AnalyseBreakRules
         {
             host = "刘海涛";
             teamMembers = "刘海涛，刘状林，刘方乾，贾俊绍";
+            randomTeamMembers = teamMembers.Split('，');
             breakRulefileNames = new List<string>();
             exampleFilesName = new List<string>();
             modelFileName = "";
@@ -491,8 +493,60 @@ namespace AnalyseBreakRules
                         _br.team = _m.team;
                     }
                 }
+                //把同班组人员找出来
+                //加上主持人，随机干部与责任人
+                Random _rd = new Random();
+                string randomName = "";
+                /*
+                do
+                {
+                    randomName = randomTeamMembers[_rd.Next(0, randomTeamMembers.Length)].Trim();
+                }
+                while (randomName.Equals(_br.analyseHost));
+                */
+                _br.analyseTeam = _br.analyseHost ;
+                //严重违标所有管理人员都来
+                if(_br.breakRuleClass == 3)
+                {
+                    _br.analyseTeam = _br.analyseTeam + teamMembers;
+                }
+
+                if(_br.team.Contains("线路所")||
+                    _br.team.Contains("城际")||
+                    _br.team.Contains("南动车所") ||
+                    _br.team.Contains("南站")||
+                   _br.team.Contains("备班"))
+                {
+                    if(_br.team.Contains("线路所")||
+                        _br.team.Contains("城际站")||
+                        _br.team.Contains("备班"))
+                    {
+                        _br.analyseTeam = _br.analyseTeam + "，张亚辉，" + _br.peopleLiable;
+                    }
+                    else if( _br.team.Contains("南站"))
+                    {
+                        _br.analyseTeam = _br.analyseTeam + "，岳云峰，" + _br.peopleLiable;
+                    }
+                    else if (_br.team.Contains("南动车所"))
+                    {
+                        _br.analyseTeam = _br.analyseTeam + "，杨焱鑫，" + _br.peopleLiable;
+                    }
+                }
+                else
+                {
+                    foreach (Members _m in allMembers)
+                    {
+                        //城际站线路所只来自己和辉哥
+                        if (_m.team.Equals(_br.team))
+                        {
+                            _br.analyseTeam = _br.analyseTeam + "，" + _m.name;
+                        }
+                    }
+                }
+
                 //参会人员
-                _br.analyseTeam = teamMembers;
+                //_br.analyseTeam = teamMembers;
+
                 _br = getBreakRuleSolutions(_br);
                 _breakRules.Add(_br);
             }
@@ -719,7 +773,7 @@ namespace AnalyseBreakRules
         private void fillBreakRules()
         {
             List<BreakRules> _allBr = allBreakRules;
-            int count = 0;
+            int count = 1;
             foreach(BreakRules _br in _allBr)
             {
                 FileFormat fileFormat = FileFormat.Docx;
@@ -847,7 +901,7 @@ namespace AnalyseBreakRules
                                 }
                                 if (paragraph.Text.ToString().Trim().Equals("参加"))
                                 {
-                                    TextRange tableRange = table[i, j + 1].Paragraphs[0].AppendText(teamMembers);
+                                    TextRange tableRange = table[i, j + 1].Paragraphs[0].AppendText(_br.analyseTeam);
                                     tableRange.CharacterFormat.FontName = "宋体";
                                     tableRange.CharacterFormat.FontSize = 12;
                                 }
