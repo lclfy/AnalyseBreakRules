@@ -118,7 +118,6 @@ namespace AnalyseBreakRules
                                 //try
                                 {
                                     workBook = new XSSFWorkbook(fileStream);  //xlsx数据读入workbook  
-                                    allMembers = getMembers(workBook);
                                     allBreakRules = getProblems(workBook);
                                 }
                                 //catch (Exception e)
@@ -133,7 +132,6 @@ namespace AnalyseBreakRules
                                // try
                                 {
                                     workBook = new HSSFWorkbook(fileStream);  //xls数据读入workbook  
-                                    allMembers = getMembers(workBook);
                                     allBreakRules = getProblems(workBook);
 
                                 }
@@ -158,7 +156,22 @@ namespace AnalyseBreakRules
             //读成员名单
             else if(type == 0)
             {
-
+                //加载成员名单
+                string fileName = Application.StartupPath + "\\Members.xls";
+                IWorkbook workBook;
+                FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+                try
+                {
+                    workBook = new HSSFWorkbook(fileStream);  //xlsx数据读入workbook  
+                    allMembers = getMembers(workBook);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("读取成员名单(Member.xls)出现错误,将无法获取职名,政治面貌等\n" + fileName + "\n错误内容：" + e.ToString().Split('在')[0], "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return false;
+                }
+                fileStream.Close();
+                //label2.Text = "已加载成员名单";
                 //加载分类
                 string fileNameClass = Application.StartupPath + "\\Classifications.xls";
                 IWorkbook workBookClass;
@@ -174,7 +187,7 @@ namespace AnalyseBreakRules
                     return false;
                 }
                 fileStreamClass.Close();
-                label2.Text = "已加载成员名单与违标分类";
+                label2.Text = "已加载违标分类";
 
             }
             return true;
@@ -310,7 +323,7 @@ namespace AnalyseBreakRules
             {
                 return members;
             }
-            _sheet = _mWorkBook.GetSheetAt(1);
+            _sheet = _mWorkBook.GetSheetAt(0);
             if (_sheet == null)
             {
                 return members;
@@ -328,18 +341,18 @@ namespace AnalyseBreakRules
                     continue;
                 }
                 //填上
-                if (row.GetCell(2).ToString().Trim().Length != 0)
+                if (row.GetCell(0).ToString().Trim().Length != 0)
                 {
-                    _mem.name = row.GetCell(2).ToString().Trim();
-                    if(row.GetCell(10) != null &&
-                        row.GetCell(10).ToString().Length != 0)
+                    _mem.name = row.GetCell(0).ToString().Trim();
+                    if (row.GetCell(1) != null &&
+                        row.GetCell(1).ToString().Length != 0)
                     {
-                        _mem.team = row.GetCell(10).ToString().Trim();
+                        _mem.team = row.GetCell(1).ToString().Trim();
                     }
-                    if (row.GetCell(4) != null &&
-    row.GetCell(4).ToString().Length != 0)
+                    if (row.GetCell(2) != null &&
+    row.GetCell(2).ToString().Length != 0)
                     {
-                        _mem.jobName = row.GetCell(4).ToString().Trim();
+                        _mem.jobName = row.GetCell(2).ToString().Trim();
                     }
                     if (row.GetCell(3) != null &&
     row.GetCell(3).ToString().Length != 0)
@@ -389,7 +402,7 @@ namespace AnalyseBreakRules
                             problemColumn = j;
                             titleRowCount = i;
                         }
-                        else if (text.Contains("责任人"))
+                        else if (text.Trim().Equals("责任人"))
                         {
                             peopleColumn = j;
                         }
