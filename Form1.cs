@@ -36,6 +36,10 @@ namespace AnalyseBreakRules
         string host;
         string teamMembers;
         string[] randomTeamMembers;
+        string southStationMenber;
+        string southEMUGarageMenber;
+        string eastEMUGarageMember;
+        string innercityMember;
 
         public Form1()
         {
@@ -54,7 +58,16 @@ namespace AnalyseBreakRules
         private void refreshObjects()
         {
             host = "刘海涛";
-            teamMembers = "刘海涛，刘状林，刘方乾，贾俊绍";
+            teamMembers = "刘海涛，杜鹏伟，刘方乾，贾俊绍，闫爽";
+            textBox1.Text = teamMembers;
+            southStationMenber = "岳云峰";
+            textBox2.Text = southStationMenber;
+            southEMUGarageMenber = "杨焱鑫";
+            textBox3.Text = southEMUGarageMenber;
+            innercityMember = "张亚辉";
+            textBox4.Text = innercityMember;
+            eastEMUGarageMember = "张志";
+            textBox5.Text = eastEMUGarageMember;
             randomTeamMembers = teamMembers.Split('，');
             breakRulefileNames = new List<string>();
             exampleFilesName = new List<string>();
@@ -105,6 +118,7 @@ namespace AnalyseBreakRules
                                 //try
                                 {
                                     workBook = new XSSFWorkbook(fileStream);  //xlsx数据读入workbook  
+                                    allMembers = getMembers(workBook);
                                     allBreakRules = getProblems(workBook);
                                 }
                                 //catch (Exception e)
@@ -119,7 +133,9 @@ namespace AnalyseBreakRules
                                // try
                                 {
                                     workBook = new HSSFWorkbook(fileStream);  //xls数据读入workbook  
+                                    allMembers = getMembers(workBook);
                                     allBreakRules = getProblems(workBook);
+
                                 }
                                // catch (Exception e)
                                 {
@@ -142,22 +158,6 @@ namespace AnalyseBreakRules
             //读成员名单
             else if(type == 0)
             {
-                //加载成员名单
-                string fileName = Application.StartupPath + "\\Members.xls";
-                IWorkbook workBook;
-                FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
-                try
-                {
-                    workBook = new HSSFWorkbook(fileStream);  //xlsx数据读入workbook  
-                    allMembers = getMembers(workBook);
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show("读取成员名单(Member.xls)出现错误,将无法获取职名,政治面貌等\n" + fileName + "\n错误内容：" + e.ToString().Split('在')[0], "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return false;
-                }
-                fileStream.Close();
-                //label2.Text = "已加载成员名单";
 
                 //加载分类
                 string fileNameClass = Application.StartupPath + "\\Classifications.xls";
@@ -310,7 +310,7 @@ namespace AnalyseBreakRules
             {
                 return members;
             }
-            _sheet = _mWorkBook.GetSheetAt(0);
+            _sheet = _mWorkBook.GetSheetAt(1);
             if (_sheet == null)
             {
                 return members;
@@ -323,23 +323,23 @@ namespace AnalyseBreakRules
                     continue;
                 }
                 Members _mem = new Members();
-                if (row.GetCell(0) == null)
+                if (row.GetCell(2) == null)
                 {
                     continue;
                 }
                 //填上
-                if (row.GetCell(0).ToString().Trim().Length != 0)
+                if (row.GetCell(2).ToString().Trim().Length != 0)
                 {
-                    _mem.name = row.GetCell(0).ToString().Trim();
-                    if(row.GetCell(1) != null &&
-                        row.GetCell(1).ToString().Length != 0)
+                    _mem.name = row.GetCell(2).ToString().Trim();
+                    if(row.GetCell(10) != null &&
+                        row.GetCell(10).ToString().Length != 0)
                     {
-                        _mem.team = row.GetCell(1).ToString().Trim();
+                        _mem.team = row.GetCell(10).ToString().Trim();
                     }
-                    if (row.GetCell(2) != null &&
-    row.GetCell(2).ToString().Length != 0)
+                    if (row.GetCell(4) != null &&
+    row.GetCell(4).ToString().Length != 0)
                     {
-                        _mem.jobName = row.GetCell(2).ToString().Trim();
+                        _mem.jobName = row.GetCell(4).ToString().Trim();
                     }
                     if (row.GetCell(3) != null &&
     row.GetCell(3).ToString().Length != 0)
@@ -521,15 +521,19 @@ namespace AnalyseBreakRules
                         _br.team.Contains("城际站")||
                         _br.team.Contains("备班"))
                     {
-                        _br.analyseTeam = _br.analyseTeam + "，张亚辉，" + _br.peopleLiable;
+                        _br.analyseTeam = _br.analyseTeam + "，"+innercityMember+"，" + _br.peopleLiable;
                     }
                     else if( _br.team.Contains("南站"))
                     {
-                        _br.analyseTeam = _br.analyseTeam + "，岳云峰，" + _br.peopleLiable;
+                        _br.analyseTeam = _br.analyseTeam + "，"+southStationMenber+"，" + _br.peopleLiable;
                     }
                     else if (_br.team.Contains("南动车所"))
                     {
-                        _br.analyseTeam = _br.analyseTeam + "，杨焱鑫，" + _br.peopleLiable;
+                        _br.analyseTeam = _br.analyseTeam + "，" + southEMUGarageMenber + "，" + _br.peopleLiable;
+                    }
+                    else if (_br.team.Contains("东动车所"))
+                    {
+                        _br.analyseTeam = _br.analyseTeam + "，" + eastEMUGarageMember + "，" + _br.peopleLiable;
                     }
                 }
                 else
@@ -837,7 +841,7 @@ namespace AnalyseBreakRules
                                     if (hasGot)
                                     {
 
-                                        tableRange = table[i, j + 1].Paragraphs[0].AppendText(dt.AddDays(rd.Next(1, 8)).ToString("MM月dd日"));
+                                        tableRange = table[i, j + 1].Paragraphs[0].AppendText(dt.AddDays(rd.Next(1, 2)).ToString("MM月dd日"));
                                     }
                                     else
                                     {
@@ -937,6 +941,20 @@ namespace AnalyseBreakRules
                 doc.SaveToFile(Application.StartupPath + "\\Outputs\\"+count.ToString()+"违标分析-"+_br.peopleLiable+".docx", FileFormat.Docx2013);
                 count++;
             }
+            MessageBox.Show("完成", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo();
+            //info.WorkingDirectory = Application.StartupPath;
+            info.FileName = Application.StartupPath + "\\Outputs\\";
+            info.Arguments = "";
+            try
+            {
+                System.Diagnostics.Process.Start(info);
+            }
+            catch (System.ComponentModel.Win32Exception we)
+            {
+                MessageBox.Show(this, we.Message);
+                return;
+            }
         }
 
         private void importSearchedProblems_btn_Click(object sender, EventArgs e)
@@ -948,6 +966,47 @@ namespace AnalyseBreakRules
         private void button1_Click(object sender, EventArgs e)
         {
             fillBreakRules();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if(textBox1.Text.Length != 0)
+            {
+                teamMembers = textBox1.Text;
+                teamMembers.Replace(",", "，");
+            }
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox2.Text.Length != 0)
+            {
+                southStationMenber = textBox2.Text;
+            }
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox3.Text.Length != 0)
+            {
+                southEMUGarageMenber = textBox3.Text;
+            }
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox4.Text.Length != 0)
+            {
+                innercityMember = textBox4.Text;
+            }
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox5.Text.Length != 0)
+            {
+                eastEMUGarageMember = textBox5.Text;
+            }
         }
     }
 }
