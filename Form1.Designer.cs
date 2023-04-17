@@ -52,7 +52,7 @@
             // importSearchedProblems_btn
             // 
             this.importSearchedProblems_btn.Location = new System.Drawing.Point(346, 310);
-            this.importSearchedProblems_btn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.importSearchedProblems_btn.Margin = new System.Windows.Forms.Padding(4);
             this.importSearchedProblems_btn.Name = "importSearchedProblems_btn";
             this.importSearchedProblems_btn.Size = new System.Drawing.Size(252, 94);
             this.importSearchedProblems_btn.TabIndex = 0;
@@ -86,9 +86,9 @@
             this.label3.Location = new System.Drawing.Point(96, 598);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(730, 24);
+            this.label3.Size = new System.Drawing.Size(718, 24);
             this.label3.TabIndex = 3;
-            this.label3.Text = "问题查询表为.xls格式 违标分析放入Examples文件夹，为.docx格式";
+            this.label3.Text = "问题查询表为.xls格式 违标分析放入Examples文件夹，为.doc格式";
             // 
             // label4
             // 
@@ -102,7 +102,7 @@
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(212, 468);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(252, 90);
             this.button1.TabIndex = 5;
@@ -113,7 +113,7 @@
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(212, 120);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(6);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(506, 35);
             this.textBox1.TabIndex = 6;
@@ -142,7 +142,7 @@
             // textBox2
             // 
             this.textBox2.Location = new System.Drawing.Point(212, 174);
-            this.textBox2.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.textBox2.Margin = new System.Windows.Forms.Padding(6);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(174, 35);
             this.textBox2.TabIndex = 8;
@@ -161,7 +161,7 @@
             // textBox3
             // 
             this.textBox3.Location = new System.Drawing.Point(544, 174);
-            this.textBox3.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.textBox3.Margin = new System.Windows.Forms.Padding(6);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(174, 35);
             this.textBox3.TabIndex = 11;
@@ -180,7 +180,7 @@
             // textBox4
             // 
             this.textBox4.Location = new System.Drawing.Point(212, 228);
-            this.textBox4.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.textBox4.Margin = new System.Windows.Forms.Padding(6);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(174, 35);
             this.textBox4.TabIndex = 12;
@@ -199,7 +199,7 @@
             // textBox5
             // 
             this.textBox5.Location = new System.Drawing.Point(544, 228);
-            this.textBox5.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.textBox5.Margin = new System.Windows.Forms.Padding(6);
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(174, 35);
             this.textBox5.TabIndex = 14;
@@ -219,7 +219,7 @@
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(470, 468);
-            this.button2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(252, 90);
             this.button2.TabIndex = 17;
@@ -261,7 +261,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.importSearchedProblems_btn);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "违标分析";
             this.Load += new System.EventHandler(this.Form1_Load);

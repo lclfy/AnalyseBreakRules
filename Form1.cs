@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Xml;
 using CCWin;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -696,7 +697,6 @@ namespace AnalyseBreakRules
                     int targetLv1Place = -1;
                     string content = "";
                     //遍历表格中的段落，找到需要的位置添加(先找lv0的)
-                    /*
                     for (int i = 0; i < table.Rows.Count; i++)
                     {
                         TableRow row = table.Rows[i];
@@ -766,7 +766,6 @@ namespace AnalyseBreakRules
                             }
                         }
                     }
-                    */
                     string test = content;
                     if (hasGotIt)
                     {
@@ -786,39 +785,48 @@ namespace AnalyseBreakRules
                                     {
                                         if (Text.Contains("分析："))
                                         {
-                                            foreach(Paragraph temp_paragraph in cell.Paragraphs)
+                                            string alltext = "";
+                                            foreach (Paragraph temp_paragraph in cell.Paragraphs)
                                             {
-                                                string alltext = temp_paragraph.Text.ToString().Trim();
-                                                _allCORB[targetLv0Place].analyseText.Add(alltext.Replace("分析：", ""));
+                                                alltext = alltext + temp_paragraph.Text.ToString().Trim();
+
                                             }
-                                          
+                                            _allCORB[targetLv0Place].analyseText.Add(alltext.Replace("分析：", ""));
+
                                         }
                                         if (Text.Contains("措施："))
                                         {
+                                            string alltext = "";
                                             foreach (Paragraph temp_paragraph in cell.Paragraphs)
                                             {
-                                                string alltext = temp_paragraph.Text.ToString().Trim();
-                                                _allCORB[targetLv0Place].solutions.Add(alltext.Replace("分析：", ""));
+                                                alltext = alltext + temp_paragraph.Text.ToString().Trim();
+
                                             }
+                                            _allCORB[targetLv0Place].solutions.Add(alltext.Replace("分析：", ""));
                                         }
                                     }
                                     else if(targetLv1Place != -1)
                                     {
                                         if (Text.Contains("分析："))
                                         {
+                                            string alltext = "";
                                             foreach (Paragraph temp_paragraph in cell.Paragraphs)
                                             {
-                                                string alltext = temp_paragraph.Text.ToString().Trim();
-                                                _allCORB[targetLv1Place].analyseText.Add(alltext.Replace("分析：", ""));
+                                                alltext = alltext + temp_paragraph.Text.ToString().Trim();
+
                                             }
+                                            _allCORB[targetLv1Place].analyseText.Add(alltext.Replace("分析：", ""));
+
                                         }
                                         if (Text.Contains("措施："))
                                         {
+                                            string alltext = "";
                                             foreach (Paragraph temp_paragraph in cell.Paragraphs)
                                             {
-                                                string alltext = temp_paragraph.Text.ToString().Trim();
-                                                _allCORB[targetLv1Place].solutions.Add(alltext.Replace("分析：", ""));
+                                                alltext = alltext + temp_paragraph.Text.ToString().Trim();
+
                                             }
+                                            _allCORB[targetLv1Place].solutions.Add(alltext.Replace("分析：", ""));
                                         }
                                     }
 
