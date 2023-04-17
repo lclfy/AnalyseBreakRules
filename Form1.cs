@@ -57,8 +57,30 @@ namespace AnalyseBreakRules
 
         private void refreshObjects()
         {
-            host = "刘海涛";
-            teamMembers = "刘海涛，杜鹏伟，刘方乾，贾俊绍，闫爽";
+            host = "姚英";
+            teamMembers = "姚英，赵明，罗思聪";
+            if (!checkBox1.Checked)
+            {
+                label6.Visible = false;
+                label7.Visible = false;
+                label8.Visible = false;
+                label9.Visible = false;
+                textBox2.Visible = false;
+                textBox3.Visible = false;
+                textBox4.Visible = false;
+                textBox5.Visible = false;
+            }
+            else
+            {
+                label6.Visible = true;
+                label7.Visible = true;
+                label8.Visible = true;
+                label9.Visible = true;
+                textBox2.Visible = true;
+                textBox3.Visible = true;
+                textBox4.Visible = true;
+                textBox5.Visible = true;
+            }
             textBox1.Text = teamMembers;
             southStationMenber = "岳云峰";
             textBox2.Text = southStationMenber;
@@ -202,7 +224,7 @@ namespace AnalyseBreakRules
                 if (Directory.Exists(path))
                 {
                     //搜索“路径”文件夹下面的文件
-                    string[] files = Directory.GetFiles(path, "*.docx", SearchOption.AllDirectories);    //从“路径”中搜索所有的文件
+                    string[] files = Directory.GetFiles(path, "*.doc", SearchOption.AllDirectories);    //从“路径”中搜索所有的文件
                     SortedList<string, FileInfo> fileList = new SortedList<string, FileInfo>();     //声明一个字典，用于存储文件信息
                                                                                                     //验证是否在“路径”中搜索到了文件
                     if (files.Length > 0)
@@ -507,16 +529,11 @@ namespace AnalyseBreakRules
                     }
                 }
                 //把同班组人员找出来
-                //加上主持人，随机干部与责任人
-                Random _rd = new Random();
+                //加上主持人，班组长，随机干部与责任人
+                Random _rd = new Random(Guid.NewGuid().GetHashCode());
                 string randomName = "";
-                /*
-                do
-                {
-                    randomName = randomTeamMembers[_rd.Next(0, randomTeamMembers.Length)].Trim();
-                }
-                while (randomName.Equals(_br.analyseHost));
-                */
+                randomName = randomTeamMembers[_rd.Next(0, randomTeamMembers.Length)].Trim();
+                _br.analyseHost = randomName;
                 _br.analyseTeam = _br.analyseHost ;
                 //严重违标所有管理人员都来
                 if(_br.breakRuleClass == 3)
@@ -554,7 +571,15 @@ namespace AnalyseBreakRules
                     foreach (Members _m in allMembers)
                     {
                         //城际站线路所只来自己和辉哥
-                        if (_m.team.Equals(_br.team))
+                        if (_m.team.Equals(_br.team) && checkBox1.Checked)
+                        {
+                            _br.analyseTeam = _br.analyseTeam + "，" + _m.name;
+                        }
+                        else if(_m.team.Equals(_br.team) && _m.jobName.Contains("客运值班员") && !checkBox1.Checked)
+                        {
+                            _br.analyseTeam = _br.analyseTeam + "，" + _m.name;
+                        }
+                        else if (_m.name.Equals(_br.peopleLiable) && !checkBox1.Checked)
                         {
                             _br.analyseTeam = _br.analyseTeam + "，" + _m.name;
                         }
@@ -651,7 +676,7 @@ namespace AnalyseBreakRules
             List<ClassificationOfRuleBreaks> _allCORB = classificationOfRules;
             foreach(string fileName in exampleFilesName)
             {
-                FileFormat fileFormat = FileFormat.Docx;
+                FileFormat fileFormat = FileFormat.Doc;
                 Document doc = new Document();
                 doc.LoadFromFile(fileName, fileFormat);
                 if (doc.Sections[0] == null)
@@ -665,12 +690,13 @@ namespace AnalyseBreakRules
                 else
                 {
                     Table table = doc.Sections[0].Tables[0] as Table;
-                    bool hasGotIt = false;
+                    bool hasGotIt = true;
                     bool hasGotLevel0 = false;
                     int targetLv0Place = -1;
                     int targetLv1Place = -1;
                     string content = "";
                     //遍历表格中的段落，找到需要的位置添加(先找lv0的)
+                    /*
                     for (int i = 0; i < table.Rows.Count; i++)
                     {
                         TableRow row = table.Rows[i];
@@ -740,6 +766,7 @@ namespace AnalyseBreakRules
                             }
                         }
                     }
+                    */
                     string test = content;
                     if (hasGotIt)
                     {
@@ -759,22 +786,39 @@ namespace AnalyseBreakRules
                                     {
                                         if (Text.Contains("分析："))
                                         {
-                                            _allCORB[targetLv0Place].analyseText.Add(Text.Replace("分析：", ""));
+                                            foreach(Paragraph temp_paragraph in cell.Paragraphs)
+                                            {
+                                                string alltext = temp_paragraph.Text.ToString().Trim();
+                                                _allCORB[targetLv0Place].analyseText.Add(alltext.Replace("分析：", ""));
+                                            }
+                                          
                                         }
                                         if (Text.Contains("措施："))
                                         {
-                                            _allCORB[targetLv0Place].solutions.Add(Text.Replace("措施：", ""));
+                                            foreach (Paragraph temp_paragraph in cell.Paragraphs)
+                                            {
+                                                string alltext = temp_paragraph.Text.ToString().Trim();
+                                                _allCORB[targetLv0Place].solutions.Add(alltext.Replace("分析：", ""));
+                                            }
                                         }
                                     }
                                     else if(targetLv1Place != -1)
                                     {
                                         if (Text.Contains("分析："))
                                         {
-                                            _allCORB[targetLv1Place].analyseText.Add(Text.Replace("分析：", ""));
+                                            foreach (Paragraph temp_paragraph in cell.Paragraphs)
+                                            {
+                                                string alltext = temp_paragraph.Text.ToString().Trim();
+                                                _allCORB[targetLv1Place].analyseText.Add(alltext.Replace("分析：", ""));
+                                            }
                                         }
                                         if (Text.Contains("措施："))
                                         {
-                                            _allCORB[targetLv1Place].solutions.Add(Text.Replace("措施：", ""));
+                                            foreach (Paragraph temp_paragraph in cell.Paragraphs)
+                                            {
+                                                string alltext = temp_paragraph.Text.ToString().Trim();
+                                                _allCORB[targetLv1Place].solutions.Add(alltext.Replace("分析：", ""));
+                                            }
                                         }
                                     }
 
@@ -1020,6 +1064,11 @@ namespace AnalyseBreakRules
             {
                 eastEMUGarageMember = textBox5.Text;
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
